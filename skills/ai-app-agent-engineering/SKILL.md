@@ -51,7 +51,7 @@ If a non-technical person is building the app, read [`references/nontechnical-bu
 - Define required fields, types, enums, length limits, and whether unknown values may be `null`.
 - Validate at the application boundary with the platform's schema feature, JSON Schema, Zod, Pydantic, or an equivalent validator.
 - Keep explanatory prose outside machine-readable responses.
-- On validation failure, preserve the valid source data and request a targeted repair. Stop within the shared three-attempt limit.
+- On validation failure, preserve the valid source data and request a targeted repair within the configured task budget.
 - Never silently discard required fields or accept malformed JSON as success.
 
 ## Retrieval and grounding
@@ -77,11 +77,17 @@ If a non-technical person is building the app, read [`references/nontechnical-bu
 
 - Define a success condition the runtime can observe, not “until satisfied.”
 - Set hard limits for tool calls, repair attempts, time, and spending.
+- Normalize each tool failure to `{category, code, message, retryable}` before recovery. Keep secrets and raw sensitive payloads out of errors.
+- Use only these categories:
+  - `transient`: temporary network, timeout, rate-limit, or service failure; retry within budget with capped backoff.
+  - `validation`: invalid arguments, schema, or output; correct only the invalid data before retrying.
+  - `permission`: missing access, denied scope, or required approval; do not retry until access or approval changes.
+  - `internal`: unexpected code or provider failure; collect diagnostics and retry only after a targeted change.
 - After a failure, capture the exact error, identify one specific likely cause, and patch only that cause.
 - Do not repeat an identical call without new information.
 - Make write operations idempotent where possible and attach an operation ID to prevent duplicates.
 - For delayed approval, persist the proposed action and resumable state rather than keeping a live session open indefinitely.
-- After three unsuccessful repairs, stop with the error, attempts made, and safest next action.
+- When the configured repair budget is exhausted, stop with the error, attempts made, and safest next action.
 
 ## Verification
 

@@ -28,7 +28,7 @@
 - Do not repeat the full request or narrate routine steps.
 - Reuse existing components, utilities, schemas, and project conventions.
 - Keep only the core and currently relevant skill in active context. Load another skill only when the work changes or a linked reference is essential.
-- Before an agentic run, set a maximum of 3 repair attempts and define reasonable tool-call, time, and cost limits.
+- Before an agentic run, set task-specific repair, tool-call, time, and cost limits. Use 3 repairs only as the default when no stricter budget is warranted.
 - Never activate a paid model, service, deployment, billing account, or external API without explicit approval. Distinguish a free tier from a trial or bring-your-own-key requirement.
 
 ## Grounding and untrusted content
@@ -48,8 +48,8 @@
 
 ## Failure and verification
 
-- On failure, capture the exact error, identify a specific cause, and apply a targeted repair.
-- Never repeat the same failed action without new evidence. Stop after three unsuccessful repair attempts and return the remaining error.
+- Classify the exact error as `transient`, `validation`, `permission`, or `internal`: retry transient errors within budget; correct validation errors; stop and escalate permission errors; diagnose internal errors before retrying.
+- Never repeat the same failed action without new evidence. Stop at the configured repair limit and return the remaining error.
 - Run the narrow check related to the change, then the broader available baseline before completion.
 - Never present malformed, schema-invalid, or truncated output as complete.
 - Do not say `fixed`, `passed`, `sent`, `saved`, `deployed`, or `done` without observable evidence. If a check was unavailable, say exactly what remains unverified.

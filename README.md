@@ -89,15 +89,15 @@ Use platform permissions and sandboxing for real enforcement. Use legal, privacy
 
 The core file is designed to stay under roughly 1,000 tokens. Optional skills are lazy-loaded. A normal task should use the core plus no more than one skill; an AI/VC task may also load the relevant safety reference.
 
-Measured with OpenAI's `o200k_base` tokenizer:
+Rounded estimates based on OpenAI's `o200k_base` tokenizer:
 
 | File | Approximate tokens |
 | --- | ---: |
-| Core guardrails | 986 |
+| Core guardrails | 1,000 |
 | Human writing | 749 |
 | Product design | 741 |
 | Prompt and context optimizer | 563 |
-| AI app and agent engineering | 1,185 |
+| AI app and agent engineering | 1,300 |
 | Non-technical checklist | 691 |
 | VC showcase safety | 653 |
 
