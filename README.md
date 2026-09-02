@@ -13,7 +13,7 @@ Read [AI Jargon, in Plain English](https://rparakelyan.com/guides/ai-jargon-in-p
 1. Add this repository to your project. If your builder cannot read project files, upload the Markdown files once and put [`AI-GUARDRAILS.md`](AI-GUARDRAILS.md) in its persistent instructions.
 2. Tell the builder what you want to create. Use the short brief below if you need a starting point.
 
-That is the complete workflow. The AI chooses and reads the relevant skill when the task needs it. Before it calls the project finished, it selects and runs the applicable checks from [`EVALS.md`](EVALS.md), records the evidence, and reports anything it could not verify.
+For file-aware coding agents, that is the complete workflow. The guardrails instruct the AI to choose the relevant skill and evaluations, but this works only when the platform can access those files and run the required checks. If it cannot, it must report what was unavailable instead of claiming the skill or evaluation was applied.
 
 ### Showcase build brief
 
@@ -52,9 +52,9 @@ If you cannot find the exact place, look for a section named **Instructions**, *
 
 This file guides the AI, but it cannot control what your tool can access or do. Use your tool's permission and approval settings for that.
 
-## What the AI loads
+## How skill loading works
 
-Keep the core guardrails active and make the `skills/` folder available to the project. The AI loads the relevant file itself:
+Keep the core guardrails active and make the `skills/` folder available to the project. On a file-aware coding agent, the core instructions tell the AI to open the relevant file:
 
 | Work detected | File the AI reads |
 | --- | --- |
@@ -63,9 +63,17 @@ Keep the core guardrails active and make the `skills/` folder available to the p
 | A vague, conflicting, or oversized request | [`skills/prompt-and-context-optimizer/SKILL.md`](skills/prompt-and-context-optimizer/SKILL.md) |
 | An AI feature, workflow, or agent | [`skills/ai-app-agent-engineering/SKILL.md`](skills/ai-app-agent-engineering/SKILL.md) |
 
-The AI does not load all four by default. For this showcase, it normally uses the core plus AI app and agent engineering. It adds writing, design, or VC safety only when that work appears.
+Automatic skill selection is requested behavior, not a feature every platform guarantees:
 
-If the platform cannot access a referenced file, the AI must say so. It may continue with the core rules, but it cannot claim that the unavailable skill or its evaluations were applied.
+- File-aware coding agents can follow the file paths and load the relevant skill when needed.
+- Chat workspaces and no-code builders may use uploaded files as knowledge, but they may not follow file references or lazy-load them automatically. Only content the platform can actually access is active.
+- A deployed API application does not inherit this repository. Its backend must explicitly load the core instructions and any required skill or runtime prompt.
+
+The AI should not load all four skills by default. For this showcase, a file-aware agent normally uses the core plus AI app and agent engineering. It adds writing, design, or VC safety only when that work appears.
+
+The same boundary applies to evaluations. The core instructs a capable agent to select and run the relevant checks from [`EVALS.md`](EVALS.md). If the platform cannot execute a check or expose evidence, the result must be `BLOCKED` or unverified—not `PASS`.
+
+If the platform cannot access a referenced file, it may continue with the core rules, but it cannot claim that the unavailable skill or evaluation was applied.
 
 ## For this showcase
 
@@ -87,7 +95,7 @@ Use platform permissions and sandboxing for real enforcement. Use legal, privacy
 
 ## Token use
 
-The core file is designed to stay under roughly 1,000 tokens. Optional skills are lazy-loaded. A normal task should use the core plus no more than one skill; an AI/VC task may also load the relevant safety reference.
+The core file is designed to stay under roughly 1,000 tokens. Optional skills are intended to be loaded only when needed; automatic lazy loading depends on the platform. A normal task should use the core plus no more than one skill, while an AI/VC task may also need the relevant safety reference.
 
 Rounded estimates based on OpenAI's `o200k_base` tokenizer:
 
